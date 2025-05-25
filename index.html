@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Music Player</title>
+  <style>
+    /* Base Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* Music Player Container */
+    .player-body {
+      background-color: rgb(139, 139, 139);
+      width: 320px;
+      padding: 20px;
+      border-radius: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Search Area */
+    .search-div {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .input {
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      padding: 10px 15px;
+      outline: none;
+      width: 120px;
+      font-size: 14px;
+      background-color: #fff;
+    }
+
+    .artist-input-js,
+    .song-input-js {
+      flex: 1;
+    }
+
+    .search-button {
+      width: 35px;
+      height: 35px;
+      border: none;
+      border-radius: 50%;
+      background-color: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .search-button-img {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* Album Art Placeholder */
+    .img-div {
+      width: 200px;
+      height: 200px;
+      background-color: #fff;
+      border-radius: 15px;
+      margin-bottom: 15px;
+      background-size: cover;
+      background-position: center;
+    }
+
+    /* Song Title and Artist Name */
+    .title-div {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .title {
+      font-size: 24px;
+      color: #fff;
+      font-weight: bold;
+      word-wrap: break-word;
+    }
+
+    .artist-name {
+      font-size: 14px;
+      color: #f0f0f0;
+      margin-top: 5px;
+      word-wrap: break-word;
+    }
+
+    /* Playback Buttons */
+    .buttons-div {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 25px;
+      margin-top: 10px;
+    }
+
+    .previous,
+    .pause,
+    .next {
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+    }
+
+    .previous-img,
+    .pause-img,
+    .next-img {
+      width: 30px;
+      height: 30px;
+    }
+
+    .img-js {
+      width: 100%;
+    }
+
+    .audio-js {
+      outline: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="player-body">
+
+    <div class="search-div">
+      <input class="input artist-input-js" type="text" placeholder="Artist name..." />
+      <input class="input song-input-js" type="text" placeholder="Song name..." />
+      <button class="search-button search-button-js">
+        <img class="search-button-img" src="images/search-interface-symbol.png" alt="Search" />
+      </button>
+    </div>
+
+
+    <div class="img-div">
+      <img class="img-js img-artist" src="">
+    </div>
+
+    <div class="title-div">
+      <p class="title title-js"></p>
+      <p class="artist-name artist-name-js"></p>
+    </div>
+
+    <div class="buttons-div">
+      <audio controls class="audio-js">
+      </audio>
+    </div>
+
+  </div>
+
+  <script>async function getMusic(artist, musicName) {
+      const response = await fetch(
+        `https://itunes.apple.com/search?term=${encodeURIComponent(
+          musicName,
+        )}&entity=song&limit=10`,
+      );
+      const data = await response.json();
+      console.log(data);
+
+      let found = false;
+
+      data.results.forEach((song) => {
+        if (
+          song.artistName.toLowerCase() === artist.toLowerCase() &&
+          song.trackName.toLowerCase() === musicName.toLowerCase()
+        ) {
+          document.querySelector('.title-js').textContent = song.trackName;
+          document.querySelector('.artist-name-js').textContent = song.artistName;
+          found = true;
+          document.querySelector('.audio-js').src = song.previewUrl;
+          document.querySelector('.img-js').src = song.artworkUrl100;
+        }
+      });
+
+      if (!found) {
+        document.querySelector('.title-js').textContent = 'Song not found';
+        document.querySelector('.artist-name-js').textContent = '';
+      }
+    }
+
+    document.querySelector('.search-button-js').addEventListener('click', () => {
+      const artist = document.querySelector('.artist-input-js').value.trim();
+      const musicName = document.querySelector('.song-input-js').value.trim();
+
+      if (artist && musicName) {
+        getMusic(artist, musicName);
+      } else {
+        alert('Please enter both artist and song name.');
+      }
+    });
+  </script>
+</body>
+
+</html>
