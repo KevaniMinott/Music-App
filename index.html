@@ -170,45 +170,46 @@
   </div>
 
   <script>async function getMusic(artist, musicName) {
-      const response = await fetch(
-        `https://itunes.apple.com/search?term=${encodeURIComponent(
-          musicName,
-        )}&entity=song&limit=10`,
-      );
-      const data = await response.json();
-      console.log(data);
+  const response = await fetch(
+    `https://itunes.apple.com/search?term=${encodeURIComponent(
+      `${artist} ${musicName}`,
+    )}&entity=song&limit=10`,
+  );
 
-      let found = false;
+  const data = await response.json();
+  console.log(data);
 
-      data.results.forEach((song) => {
-        if (
-          song.artistName.toLowerCase() === artist.toLowerCase() &&
-          song.trackName.toLowerCase() === musicName.toLowerCase()
-        ) {
-          document.querySelector('.title-js').textContent = song.trackName;
-          document.querySelector('.artist-name-js').textContent = song.artistName;
-          found = true;
-          document.querySelector('.audio-js').src = song.previewUrl;
-          document.querySelector('.img-js').src = song.artworkUrl100;
-        }
-      });
+  const foundSong = data.results.find(
+    (song) =>
+      song.artistName.toLowerCase().includes(artist.toLowerCase()) &&
+      song.trackName.toLowerCase().includes(musicName.toLowerCase()),
+  );
 
-      if (!found) {
-        document.querySelector('.title-js').textContent = 'Song not found';
-        document.querySelector('.artist-name-js').textContent = '';
-      }
-    }
+  if (foundSong) {
+    document.querySelector('.title-js').textContent = foundSong.trackName;
+    document.querySelector('.artist-name-js').textContent =
+      foundSong.artistName;
+    document.querySelector('.audio-js').src = foundSong.previewUrl;
+    document.querySelector('.img-js').src = foundSong.artworkUrl100;
+  } else {
+    document.querySelector('.title-js').textContent = 'Song not found';
+    document.querySelector('.artist-name-js').textContent = '';
+    document.querySelector('.audio-js').src = '';
+    document.querySelector('.img-js').src = '';
+  }
+}
 
-    document.querySelector('.search-button-js').addEventListener('click', () => {
-      const artist = document.querySelector('.artist-input-js').value.trim();
-      const musicName = document.querySelector('.song-input-js').value.trim();
+document.querySelector('.search-button-js').addEventListener('click', () => {
+  const artist = document.querySelector('.artist-input-js').value.trim();
+  const musicName = document.querySelector('.song-input-js').value.trim();
 
-      if (artist && musicName) {
-        getMusic(artist, musicName);
-      } else {
-        alert('Please enter both artist and song name.');
-      }
-    });
+  if (artist && musicName) {
+    getMusic(artist, musicName);
+  } else {
+    alert('Please enter both artist and song name.');
+  }
+});
+
   </script>
 </body>
 
